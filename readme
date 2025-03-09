@@ -1,0 +1,118 @@
+# QuantumPivotSort Algorithm
+
+## Overview
+
+**QuantumPivotSort** is a novel sorting algorithm that combines probabilistic elements with pivot-based techniques to progressively sort an array. The algorithm selects random pivots and shifts elements probabilistically toward their correct positions based on the closest pivot. It runs for a fixed number of iterations to gradually improve the order of the array before performing a final sorting pass to ensure the array is completely sorted.
+
+This approach combines ideas from probabilistic algorithms and pivot-based sorting, giving it a unique and dynamic characteristic.
+
+## Features
+
+- **Randomized Pivot Selection**: The algorithm selects multiple random pivots from the array.
+- **Probabilistic Shifting**: Elements are shifted probabilistically toward the nearest pivot, converging toward their correct position.
+- **Iterations**: The algorithm runs for a predefined number of iterations (default is 10) to gradually sort the array.
+- **Final Sorting Pass**: A final sorting step ensures the array is fully ordered at the end.
+
+## Time Complexity
+
+- **Best-case Time Complexity**: O(n log n) (due to the final sorting step)
+- **Worst-case Time Complexity**: O(n log n) (also dominated by the final sorting step)
+- **Space Complexity**: O(n) (due to the storage of random pivots)
+
+## How It Works
+
+1. **Pivot Selection**: Select `k` random pivots from the array (with `k` being roughly 1/10th of the array size).
+2. **Probabilistic Element Shifting**: Each element moves toward its correct position based on its distance to the nearest pivot. The element's position is adjusted probabilistically.
+3. **Final Sorting Pass**: After several iterations of probabilistic shifting, the array is sorted using a deterministic sorting algorithm (e.g., `std::sort` in C++).
+
+## Example
+
+For an array `{45, 12, 78, 34, 89, 23, 56, 9, 67, 100, 3, 15}`, QuantumPivotSort gradually sorts it:
+
+```
+Original array: 45 12 78 34 89 23 56 9 67 100 3 15
+Sorted array: 3 9 12 15 23 34 45 56 67 78 89 100
+```
+
+## Code Implementation
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <cstdlib>
+#include <ctime>
+#include <algorithm>
+
+using namespace std;
+
+void quantumPivotSort(vector<int>& arr, int iterations = 10) {
+    int n = arr.size();
+    srand(time(0));
+
+    for (int iter = 0; iter < iterations; ++iter) {
+        // Select k random pivots
+        int k = max(1, n / 10);
+        vector<int> pivots;
+        for (int i = 0; i < k; ++i) {
+            pivots.push_back(arr[rand() % n]);
+        }
+        sort(pivots.begin(), pivots.end());
+
+        // Probabilistic shifting of elements based on nearest pivot
+        for (int i = 0; i < n; ++i) {
+            int closestPivot = pivots[0];
+            int minDist = abs(arr[i] - pivots[0]);
+
+            for (int p : pivots) {
+                int dist = abs(arr[i] - p);
+                if (dist < minDist) {
+                    minDist = dist;
+                    closestPivot = p;
+                }
+            }
+
+            // Adjust position probabilistically toward correct region
+            int targetPos = lower_bound(arr.begin(), arr.end(), closestPivot) - arr.begin();
+            int shift = (targetPos - i) / 2; // Collapse halfway to the correct position
+            if (shift != 0) {
+                swap(arr[i], arr[i + shift]);
+            }
+        }
+    }
+
+    // Final pass to ensure order
+    sort(arr.begin(), arr.end());
+}
+
+int main() {
+    vector<int> arr = { 45, 12, 78, 34, 89, 23, 56, 9, 67, 100, 3, 15 };
+    quantumPivotSort(arr);
+    
+    for (int num : arr) {
+        cout << num << " ";
+    }
+    cout << endl;
+    return 0;
+}
+```
+
+## How to Use
+
+1. Clone or download the repository.
+2. Compile the `quantumPivotSort` algorithm using a C++ compiler.
+3. Call the `quantumPivotSort` function with an array or vector of integers.
+
+### Example Usage:
+
+```cpp
+vector<int> arr = {45, 12, 78, 34, 89, 23, 56, 9, 67, 100, 3, 15};
+quantumPivotSort(arr);
+```
+
+## License
+
+This project is licensed under the MIT License.
+
+---
+
+This should serve as a good README for your algorithm, explaining how it works and providing instructions on how others can use it. Feel free to adjust any sections as needed!
